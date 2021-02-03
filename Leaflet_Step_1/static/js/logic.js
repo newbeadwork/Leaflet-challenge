@@ -1,6 +1,6 @@
 
 
-var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson";
+var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_week.geojson";
 
 
 d3.json(queryUrl).then(function(data) {
@@ -8,7 +8,7 @@ d3.json(queryUrl).then(function(data) {
   console.log(data.features);
 
   
-  var earthquakes = L.geoJSON(data.features);
+  //var earthquakes = L.geoJSON(data.features);
 
   
 
@@ -20,7 +20,39 @@ d3.json(queryUrl).then(function(data) {
   });
 
   
-  var myMap = L.map("mapid", {
+  
+  
+
+function onEachFeatureFunc(feature, layer) {
+   layer.bindPopup("<h3>" + feature.properties.place +
+     "</h3><hr><p>" + new Date(feature.properties.time) + "</p>" +
+     "</h3><hr><p><strong>" + feature.properties.mag + "</strong></p>");
+     
+ }
+
+ 
+
+ function pointToLayerFunc(feature, latlng) {
+  feature.properties.mag = +feature.properties.mag;
+  var geojsonMarkerOptions = {
+    radius: feature.properties.mag*2,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+  };
+  return L.circleMarker(latlng, geojsonMarkerOptions);
+ }
+
+
+
+  
+   var earthquakes = L.geoJSON(data.features, {
+     onEachFeature: onEachFeatureFunc,
+     pointToLayer: pointToLayerFunc
+   });
+   var myMap = L.map("mapid", {
     center: [
       37.09, -95.71
     ],
