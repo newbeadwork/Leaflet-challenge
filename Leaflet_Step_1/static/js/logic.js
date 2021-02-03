@@ -26,23 +26,41 @@ d3.json(queryUrl).then(function(data) {
 function onEachFeatureFunc(feature, layer) {
    layer.bindPopup("<h3>" + feature.properties.place +
      "</h3><hr><p>" + new Date(feature.properties.time) + "</p>" +
-     "</h3><hr><p><strong>" + feature.properties.mag + "</strong></p>");
+     "</h3><hr><p><strong>" + feature.properties.mag + "</strong></p>" +
+     "</h3><hr><p><strong>" + feature.geometry.coordinates[2] + "</strong></p>");
      
  }
 
- 
+ function getColor(d) {
+  return d > 90
+    ? "#800026"
+    : d > 70
+    ? "#BD0026"
+    : d > 50
+    ? "#E31A1C"
+    : d > 30
+    ? "#FC4E2A"
+    : d > 10
+    ? "#FD8D3C"
+    : d <= 10
+    ? "#FEB24C"
+    : "#FFF";
+}
 
  function pointToLayerFunc(feature, latlng) {
   feature.properties.mag = +feature.properties.mag;
+  feature.geometry.coordinates[2] = +feature.geometry.coordinates[2];
+  
   var geojsonMarkerOptions = {
     radius: feature.properties.mag*2,
-    fillColor: "#ff7800",
+    fillColor: getColor(feature.geometry.coordinates[2]),
     color: "#000",
     weight: 1,
     opacity: 1,
     fillOpacity: 0.8
   };
   return L.circleMarker(latlng, geojsonMarkerOptions);
+  
  }
 
 
