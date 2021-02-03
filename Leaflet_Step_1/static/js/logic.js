@@ -26,8 +26,8 @@ d3.json(queryUrl).then(function(data) {
 function onEachFeatureFunc(feature, layer) {
    layer.bindPopup("<h3>" + feature.properties.place +
      "</h3><hr><p>" + new Date(feature.properties.time) + "</p>" +
-     "</h3><hr><p><strong>" + feature.properties.mag + "</strong></p>" +
-     "</h3><hr><p><strong>" + feature.geometry.coordinates[2] + "</strong></p>");
+     "</h3><hr><p><strong>Magnitude: " + feature.properties.mag + "</strong></p>" +
+     "</h3><hr><p><strong>Depth (miles):" + feature.geometry.coordinates[2] + "</strong></p>");
      
  }
 
@@ -43,7 +43,7 @@ function onEachFeatureFunc(feature, layer) {
     : d > 10
     ? "#ffeda0"
     : d <= 10
-    ? "#f7fcb9"
+    ? "#99d8c9"
     : "#FFF";
 }
 
@@ -52,7 +52,7 @@ function onEachFeatureFunc(feature, layer) {
   feature.geometry.coordinates[2] = +feature.geometry.coordinates[2];
   
   var geojsonMarkerOptions = {
-    radius: feature.properties.mag*2,
+    radius: feature.properties.mag*3,
     fillColor: getColor(feature.geometry.coordinates[2]),
     color: "#000",
     weight: 1,
@@ -81,16 +81,20 @@ legend.onAdd = function (map) {
 
     var div = L.DomUtil.create('div', 'info legend'),
         grades = [-10, 10, 30, 50, 70, 90],
-        labels = [];
+        labels = ['<strong> Depth of earthquakes(miles) </strong>'];
+        
 
-    // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-    }
-
-    return div;
+        for (var i = 0; i < grades.length; i++) {
+            from = grades [i];
+            to = grades[i+1]-1;
+    
+        labels.push(
+            '<i style="background:' + getColor(from + 1) + '"></i> ' +
+            from + (to ? '&ndash;' + to : '+'));
+            }
+            div.innerHTML = labels.join('<br>');
+            return div;
+    
 };
 
 legend.addTo(myMap);
