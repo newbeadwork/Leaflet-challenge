@@ -41,9 +41,9 @@ function onEachFeatureFunc(feature, layer) {
     : d > 30
     ? "#FC4E2A"
     : d > 10
-    ? "#FD8D3C"
+    ? "#ffeda0"
     : d <= 10
-    ? "#FEB24C"
+    ? "#f7fcb9"
     : "#FFF";
 }
 
@@ -57,15 +57,12 @@ function onEachFeatureFunc(feature, layer) {
     color: "#000",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.8
+    fillOpacity: 0.6
   };
   return L.circleMarker(latlng, geojsonMarkerOptions);
   
  }
 
-
-
-  
    var earthquakes = L.geoJSON(data.features, {
      onEachFeature: onEachFeatureFunc,
      pointToLayer: pointToLayerFunc
@@ -77,7 +74,26 @@ function onEachFeatureFunc(feature, layer) {
     zoom: 5,
     layers: [darkmap, earthquakes]
   });
-  
+
+  var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [-10, 10, 30, 50, 70, 90],
+        labels = [];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(myMap);
   });
 
   
