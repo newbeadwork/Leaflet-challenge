@@ -134,6 +134,18 @@ d3.json(queryUrl).then(function (data) {
   };
 
   legend.addTo(myMap);
+  myMap.on('overlayadd', function(eventLayer){
+    if (eventLayer.name === 'Earthquakes'){
+        myMap.addControl(legend);
+    } 
+});
+
+myMap.on('overlayremove', function(eventLayer){
+    if (eventLayer.name === 'Earthquakes'){
+         myMap.removeControl(legend);
+    } 
+});
+﻿
 });
 })
 
