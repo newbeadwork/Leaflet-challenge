@@ -84,6 +84,8 @@ d3.json(queryUrl).then(function (data) {
   
   var tectonicBoundaries = L.geoJSON(dataBoundries.features);
   
+  //var earthquakeLayer = L.layerGroup(earthquakes);
+ //var tectonicLayer = L.layerGroup(tectonicBoundaries);
   
   //Adding layer to the map
   var myMap = L.map("mapid", {
@@ -91,21 +93,19 @@ d3.json(queryUrl).then(function (data) {
       37.09, -95.71
     ],
     zoom: 5,
-    layers: [satellitemap, earthquakes, tectonicBoundaries]  
+    layers: [satellitemap, earthquakes]  
   });
+  
   var baseMaps = {
     Sattelite: satellitemap,
     Light: lightmap,
     Dark: darkmap
   };
 
-  var earthquakeLayer = L.layerGroup(earthquakes);
- // var tectonicLayer = L.layerGroup(tectonicBoundaries);
-  
   
   var markersOnMaps = {
-    Earthquakes: earthquakeLayer
-    //Tectonic: tectonicLayer
+    Earthquakes: earthquakes,
+    Tectonic: tectonicBoundaries 
   };
   
   L.control.layers(baseMaps, markersOnMaps, {
