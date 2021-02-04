@@ -1,19 +1,36 @@
 
-var queryUrl = "static/PB2002_boundaries.json";
+var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_week.geojson";
+//var queryUrlBoundries = "static/PB2002_boundaries.json";
+
 
 //Opening the data
+d3.json("static/PB2002_boundaries.json").then(function (dataBoundries) {
+    console.log(dataBoundries);
 d3.json(queryUrl).then(function (data) {
-
+       
   //Checking the data
   console.log(data.features);
-//Creating a base layer
-var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    maxZoom: 18,
-    id: "satellite-v9",
-    accessToken: API_KEY
-  });
+    //Creating a base layer
+    var satellitemap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+        attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+        maxZoom: 18,
+        id: "satellite-v9",
+        accessToken: API_KEY
+    });
+    var lightmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+        attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+        maxZoom: 18,
+        id: "light-v10",
+        accessToken: API_KEY
+    });
 
+    var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+        attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+        maxZoom: 18,
+        id: "dark-v10",
+        accessToken: API_KEY
+    });
+  
   //Function for pop-up
   function createPopups(feature, layer) {
     layer.bindPopup("<h3>" + feature.properties.place +
@@ -47,7 +64,7 @@ var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
     feature.geometry.coordinates[2] = +feature.geometry.coordinates[2];
 
     //Markers
-    var geojsonMarkerOptions = {
+    var MarkerOptions = {
       radius: feature.properties.mag * 3,
       fillColor: getColor(feature.geometry.coordinates[2]),
       color: "#000",
@@ -55,7 +72,7 @@ var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
       opacity: 1,
       fillOpacity: 0.6
     };
-    return L.circleMarker(latlng, geojsonMarkerOptions);
+    return L.circleMarker(latlng, MarkerOptions);
 
   }
 
@@ -65,15 +82,36 @@ var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
     pointToLayer: createCircles
   });
   
+  var tectonicBoundaries = L.geoJSON(dataBoundries.features);
+  
+  
   //Adding layer to the map
   var myMap = L.map("mapid", {
     center: [
       37.09, -95.71
     ],
     zoom: 5,
-    layers: [darkmap, earthquakes]
+    layers: [satellitemap, earthquakes, tectonicBoundaries]  
   });
+  var baseMaps = {
+    Sattelite: satellitemap,
+    Light: lightmap,
+    Dark: darkmap
+  };
 
+  var earthquakeLayer = L.layerGroup(earthquakes);
+ // var tectonicLayer = L.layerGroup(tectonicBoundaries);
+  
+  
+  var markersOnMaps = {
+    Earthquakes: earthquakeLayer
+    //Tectonic: tectonicLayer
+  };
+  
+  L.control.layers(baseMaps, markersOnMaps, {
+    collapsed: false
+  }
+).addTo(myMap);
   //Creating a legend
   var legend = L.control({ position: 'bottomright' });
 
@@ -96,5 +134,6 @@ var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z
   };
 
   legend.addTo(myMap);
+});
 })
 

@@ -13,7 +13,7 @@ d3.json(queryUrl).then(function (data) {
     maxZoom: 18,
     id: "dark-v10",
     accessToken: API_KEY
-  });
+});
 
   //Function for pop-up
   function createPopups(feature, layer) {
